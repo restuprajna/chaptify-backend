@@ -1,10 +1,15 @@
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from motor.motor_asyncio import AsyncIOMotorClient
+from bson import ObjectId
+from typing import Optional
+import os
 
-DATABASE_URL = "sqlite:///./library.db"
+# Use environment variables for sensitive information
+MONGO_DB_URL = os.getenv("MONGO_DB_URL", "mongodb://localhost:27017")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-metadata = MetaData()
+# Initialize the MongoDB client and the database
+client = AsyncIOMotorClient(MONGO_DB_URL)
+db = client["library_db"]  # The name of your MongoDB database
+
+# Utility function to convert ObjectId to string
+def obj_id_to_str(id: Optional[ObjectId]):
+    return str(id) if id else None

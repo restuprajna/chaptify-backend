@@ -8,11 +8,8 @@ class BookCreate(BaseModel):
     tags: Optional[str] = None
 
 class BookOut(BookCreate):
-    id: int
+    id: str
     is_available: bool
-
-    class Config:
-        orm_mode = True
 
 class UserCreate(BaseModel):
     email: str

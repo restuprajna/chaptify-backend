@@ -1,24 +1,30 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from . import models, schemas, crud
-from .database import engine, SessionLocal, Base
-
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# main.py
+from fastapi import FastAPI, HTTPException
+from .models import BookModel, UserModel
+from .crud import create_book, get_book_by_id, update_book, delete_book
 
 app = FastAPI()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@app.post("/books/", response_model=BookModel)
+async def create_book_endpoint(book: BookModel):
+    return await create_book(book)
 
-@app.post("/books/", response_model=schemas.BookOut)
-def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
-    return crud.create_book(db=db, book=book)
+@app.get("/books/{book_id}", response_model=BookModel)
+async def get_book(book_id: str):
+    book = await get_book_by_id(book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
 
-@app.get("/books/", response_model=list[schemas.BookOut])
-def read_books(db: Session = Depends(get_db)):
-    return crud.get_books(db=db)
+@app.put("/books/{book_id}", response_model=BookModel)
+async def update_book_endpoint(book_id: str, book: BookModel):
+    updated_book = await update_book(book_id, book)
+    if not updated_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return updated_book
+
+@app.delete("/books/{book_id}", response_model=dict)
+async def delete_book_endpoint(book_id: str):
+    if not await delete_book(book_id):
+        raise HTTPException(status_code=404, detail="Book not found")
+    return {"message": "Book deleted successfully"}
