@@ -1,2 +1,8 @@
 .conda/
 .env
+# Python and Django
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.db
