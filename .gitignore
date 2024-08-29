@@ -1,2 +1,2 @@
-.conda
-.gitignore
+.conda/
+.env
