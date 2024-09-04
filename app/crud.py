@@ -5,7 +5,7 @@ from .database import db
 
 async def create_book(book: BookModel) -> BookModel:
     try:
-        book_dict = book.dict(by_alias=True)  # Convert Pydantic model to dictionary
+        book_dict = book.model_dump(by_alias=True)  # Convert Pydantic model to dictionary
         result = await db["books"].insert_one(book_dict)
         created_book = await db["books"].find_one({"_id": result.inserted_id})
         return BookModel(**created_book)  # Automatically converts ObjectId to str

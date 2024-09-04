@@ -1,5 +1,4 @@
-# models.py
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional
 from bson import ObjectId
 
@@ -12,13 +11,14 @@ class BookModel(BaseModel):
     is_available: bool = True
 
     # Validator to convert ObjectId to string
-    @validator("id", pre=True, always=True)
+    @field_validator("id", mode="before")
     def convert_object_id(cls, value):
         return str(value) if isinstance(value, ObjectId) else value
 
-    class Config:
-        allow_population_by_field_name = True  # Allow use of _id as an alias
-        arbitrary_types_allowed = True  # Allows using ObjectId type
+    model_config = ConfigDict(
+        populate_by_name=True,  # Allow use of _id as an alias
+        arbitrary_types_allowed=True  # Allows using ObjectId type
+    )
 
 class UserModel(BaseModel):
     id: Optional[str] = Field(None, alias="_id")  # Alias for MongoDB's _id field
@@ -27,10 +27,11 @@ class UserModel(BaseModel):
     is_active: bool = True
 
     # Validator to convert ObjectId to string
-    @validator("id", pre=True, always=True)
+    @field_validator("id", mode="before")
     def convert_object_id(cls, value):
         return str(value) if isinstance(value, ObjectId) else value
 
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
