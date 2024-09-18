@@ -5,3 +5,7 @@ sqlalchemy
 python-dotenv
 pymongo
 motor
+pyd
+passlib
+pydantic-settings
+pydantic[email]
